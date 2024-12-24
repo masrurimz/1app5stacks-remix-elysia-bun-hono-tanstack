@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "biomejs.biome",
+    "bradlc.vscode-tailwindcss",
+    "esbenp.prettier-vscode",
+    "qwtel.sqlite-viewer",
+    "yoavbls.pretty-ts-errors",
+    "github.vscode-github-actions"
+  ]
+}
