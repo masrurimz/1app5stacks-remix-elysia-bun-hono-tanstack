@@ -1,7 +1,7 @@
-import { eq, or } from "drizzle-orm";
+import { eq, or, sql, desc } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "~/db/db.server";
-import { votes, type Pokemon, type Vote } from "~/db/schema";
+import { pokemon, votes, type Pokemon, type Vote } from "~/db/schema";
 
 export type { Pokemon, Vote };
 
@@ -50,35 +50,39 @@ export async function voteForPokemon(
 }
 
 export async function getPokemonResults() {
-	const votesPerPokemon = await db.query.pokemon.findMany({
-		columns: {
-			id: true,
-			name: true,
-		},
-		with: {
-			votesFor: true,
-			votesAgainst: true,
-		},
-	});
-
-	return votesPerPokemon
-		.map((pokemon) => {
-			const upVotes = pokemon.votesFor.length ?? 0;
-			const downVotes = pokemon.votesAgainst.length ?? 0;
-			const totalVotes = upVotes + downVotes;
-
-			return {
-				dexId: pokemon.id,
-				name: pokemon.name,
-				upVotes,
-				downVotes,
-				winPercentage: totalVotes > 0 ? (upVotes / totalVotes) * 100 : 0,
-			};
+	const results = await db
+		.select({
+			dexId: pokemon.id,
+			name: pokemon.name,
+			upVotes: sql<number>`count(distinct ${votes.id}) filter (where ${votes.votedForId} = ${pokemon.id})`,
+			downVotes: sql<number>`count(distinct ${votes.id}) filter (where ${votes.votedAgainstId} = ${pokemon.id})`,
+			winPercentage: sql<number>`
+        case 
+          when (count(${votes.id}) filter (where ${votes.votedForId} = ${pokemon.id} or ${votes.votedAgainstId} = ${pokemon.id})) = 0 then 0
+          else CAST(count(${votes.id}) filter (where ${votes.votedForId} = ${pokemon.id}) AS FLOAT) * 100.0 / 
+               count(${votes.id}) filter (where ${votes.votedForId} = ${pokemon.id} or ${votes.votedAgainstId} = ${pokemon.id})
+        end
+      `,
 		})
-		.sort((a, b) => {
-			if (b.winPercentage !== a.winPercentage) {
-				return b.winPercentage - a.winPercentage;
-			}
-			return b.upVotes - a.upVotes;
-		});
+		.from(pokemon)
+		.leftJoin(
+			votes,
+			or(
+				eq(votes.votedForId, pokemon.id),
+				eq(votes.votedAgainstId, pokemon.id),
+			),
+		)
+		.groupBy(pokemon.id, pokemon.name)
+		.orderBy(
+			desc(sql`case 
+        when (count(${votes.id}) filter (where ${votes.votedForId} = ${pokemon.id} or ${votes.votedAgainstId} = ${pokemon.id})) = 0 then 0
+        else CAST(count(${votes.id}) filter (where ${votes.votedForId} = ${pokemon.id}) AS FLOAT) * 100.0 / 
+             count(${votes.id}) filter (where ${votes.votedForId} = ${pokemon.id} or ${votes.votedAgainstId} = ${pokemon.id})
+      end`),
+			desc(
+				sql`count(distinct ${votes.id}) filter (where ${votes.votedForId} = ${pokemon.id})`,
+			),
+		);
+
+	return results;
 }
