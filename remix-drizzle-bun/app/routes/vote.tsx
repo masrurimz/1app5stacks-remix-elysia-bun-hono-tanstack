@@ -1,109 +1,43 @@
-import type {
-	ActionFunctionArgs,
-	LoaderFunctionArgs,
-	MetaFunction,
-} from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { useFetcher, useLoaderData, useNavigation } from "@remix-run/react";
-import { PokemonSprite } from "~/components/features/pokemon/sprite";
-import { getRandomPokemonPair, voteForPokemon } from "~/models/pokemon.server";
-import { cn } from "~/utils/misc";
+import { Link, Outlet } from "@remix-run/react";
 
-export async function loader({ request }: LoaderFunctionArgs) {
-	const pokemonPair = await getRandomPokemonPair();
-	return json({ pokemonPair });
-}
-
-export async function action({ request }: ActionFunctionArgs) {
-	const formData = await request.formData();
-	const votedForId = Number(formData.get("votedForId"));
-	const votedAgainstId = Number(formData.get("votedAgainstId"));
-
-	await voteForPokemon({ votedForId, votedAgainstId });
-	return json({ success: true });
-}
-
-export default function VotePage() {
-	const navigation = useNavigation();
-
-	return (
-		<div className="flex min-h-[80vh] items-center justify-center gap-16">
-			{navigation.state === "loading" ? <VoteFallback /> : <Content />}
-		</div>
-	);
-}
-
-function Content() {
-	const fetcher = useFetcher();
-	const { pokemonPair } = useLoaderData<typeof loader>();
-	const navigation = useNavigation();
-	const [pokemonOne, pokemonTwo] = pokemonPair;
-	const isVoting =
-		fetcher.state === "submitting" || navigation.state === "loading";
-
-	return (
-		<>
-			{/* Pokemon One */}
-			<div className="flex flex-col items-center gap-4">
-				<PokemonSprite dexId={pokemonOne.id} className="w-64 h-64" />
-				<div className="text-center">
-					<span className="text-lg text-gray-500">#{pokemonOne.id}</span>
-					<h2 className="text-2xl font-bold capitalize">{pokemonOne.name}</h2>
-					<fetcher.Form method="post">
-						<input type="hidden" name="votedForId" value={pokemonOne.id} />
-						<input type="hidden" name="votedAgainstId" value={pokemonTwo.id} />
-						<button
-							disabled={isVoting}
-							className={cn(
-								"px-8 py-3 text-lg font-semibold text-white transition-colors bg-blue-500 rounded-lg hover:bg-blue-600 disabled:bg-blue-300",
-								isVoting && "opacity-50 cursor-not-allowed",
-							)}
-						>
-							Vote
-						</button>
-					</fetcher.Form>
+const VoteLayout = ({ children }: { children: React.ReactNode }) => (
+	<div className="flex flex-col justify-between min-h-screen antialiased text-white border-t-2 border-purple-600 min-w-screen bg-gray-950">
+		<header className="px-8 py-4">
+			<div className="flex items-center justify-between">
+				<div className="flex items-baseline">
+					<Link to="/vote" className="text-3xl font-bold">
+						round<span className="text-purple-600">est</span>
+						<span className="pl-2 text-2xl text-gray-400 font-extralight">
+							(Remix + Drizzle + Bun Stack Version)
+						</span>
+					</Link>
 				</div>
+				<nav className="flex flex-row items-center gap-8">
+					<Link to="/vote/results" className="text-lg hover:underline">
+						Results
+					</Link>
+				</nav>
 			</div>
+		</header>
 
-			{/* Pokemon Two */}
-			<div className="flex flex-col items-center gap-4">
-				<PokemonSprite dexId={pokemonTwo.id} className="w-64 h-64" />
-				<div className="text-center">
-					<span className="text-lg text-gray-500">#{pokemonTwo.id}</span>
-					<h2 className="text-2xl font-bold capitalize">{pokemonTwo.name}</h2>
-					<fetcher.Form method="post">
-						<input type="hidden" name="votedForId" value={pokemonTwo.id} />
-						<input type="hidden" name="votedAgainstId" value={pokemonOne.id} />
-						<button
-							disabled={isVoting}
-							className="px-8 py-3 text-lg font-semibold text-white transition-colors bg-blue-500 rounded-lg hover:bg-blue-600 disabled:bg-blue-300"
-						>
-							Vote
-						</button>
-					</fetcher.Form>
-				</div>
-			</div>
-		</>
-	);
-}
+		<main className="flex-1">{children}</main>
 
-export function VoteFallback() {
+		<footer className="py-3 font-light text-center text-gray-500">
+			<a
+				href="https://github.com/masrurimz/1app5stacks-remix-elysia-bun-hono-tanstack"
+				target="_blank"
+				rel="noopener noreferrer"
+			>
+				GitHub
+			</a>
+		</footer>
+	</div>
+);
+
+export default function Layout() {
 	return (
-		<>
-			{[1, 2].map((i) => (
-				<div key={i} className="flex flex-col items-center gap-4">
-					<div className="w-64 h-64 rounded-lg animate-pulse bg-gray-800/10" />
-					<div className="flex flex-col items-center justify-center space-y-2 text-center">
-						<div className="w-16 h-6 rounded animate-pulse bg-gray-800/10" />
-						<div className="w-32 h-8 rounded animate-pulse bg-gray-800/10" />
-						<div className="w-24 h-12 rounded animate-pulse bg-gray-800/10" />
-					</div>
-				</div>
-			))}
-		</>
+		<VoteLayout>
+			<Outlet />
+		</VoteLayout>
 	);
 }
-
-export const meta: MetaFunction = () => {
-	return [{ title: "Roundest (Remix + Drizzle + Bun Stack Version)" }];
-};
