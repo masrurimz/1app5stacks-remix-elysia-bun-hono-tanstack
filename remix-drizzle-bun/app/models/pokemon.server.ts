@@ -56,8 +56,8 @@ export async function getPokemonResults() {
 			name: true,
 		},
 		with: {
-			votesAgainst: true,
 			votesFor: true,
+			votesAgainst: true,
 		},
 	});
 

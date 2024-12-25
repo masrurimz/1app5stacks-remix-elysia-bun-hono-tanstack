@@ -91,9 +91,9 @@ export const voteRelations = relations(votes, ({ one }) => ({
 
 export const pokemonRelations = relations(pokemon, ({ many }) => ({
 	votesFor: many(votes, {
-		relationName: "votedFor",
+		relationName: "votesFor",
 	}),
 	votesAgainst: many(votes, {
-		relationName: "votedAgainst",
+		relationName: "votesAgainst",
 	}),
 }));
