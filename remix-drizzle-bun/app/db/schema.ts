@@ -76,7 +76,7 @@ export const votes = sqliteTable("votes", {
 export type Vote = typeof votes.$inferSelect;
 export type NewVote = typeof votes.$inferInsert;
 
-export const pokemonRelations = relations(votes, ({ one }) => ({
+export const voteRelations = relations(votes, ({ one }) => ({
 	votedFor: one(pokemon, {
 		relationName: "votesFor",
 		fields: [votes.votedForId],
@@ -86,5 +86,14 @@ export const pokemonRelations = relations(votes, ({ one }) => ({
 		relationName: "votesAgainst",
 		fields: [votes.votedAgainstId],
 		references: [pokemon.id],
+	}),
+}));
+
+export const pokemonRelations = relations(pokemon, ({ many }) => ({
+	votesFor: many(votes, {
+		relationName: "votedFor",
+	}),
+	votesAgainst: many(votes, {
+		relationName: "votedAgainst",
 	}),
 }));
