@@ -1,4 +1,8 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import type {
+	ActionFunctionArgs,
+	LoaderFunctionArgs,
+	MetaFunction,
+} from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Form, useLoaderData, useNavigation } from "@remix-run/react";
 import { PokemonSprite } from "~/components/features/pokemon/sprite";
@@ -19,13 +23,23 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function VotePage() {
+	const navigation = useNavigation();
+
+	return (
+		<div className="flex min-h-[80vh] items-center justify-center gap-16">
+			{navigation.state === "loading" ? <VoteFallback /> : <Content />}
+		</div>
+	);
+}
+
+function Content() {
 	const { pokemonPair } = useLoaderData<typeof loader>();
 	const navigation = useNavigation();
 	const [pokemonOne, pokemonTwo] = pokemonPair;
 	const isVoting = navigation.state === "submitting";
 
 	return (
-		<div className="flex min-h-[80vh] items-center justify-center gap-16">
+		<>
 			{/* Pokemon One */}
 			<div className="flex flex-col items-center gap-4">
 				<PokemonSprite dexId={pokemonOne.id} className="w-64 h-64" />
@@ -63,6 +77,27 @@ export default function VotePage() {
 					</Form>
 				</div>
 			</div>
-		</div>
+		</>
 	);
 }
+
+export function VoteFallback() {
+	return (
+		<>
+			{[1, 2].map((i) => (
+				<div key={i} className="flex flex-col items-center gap-4">
+					<div className="w-64 h-64 rounded-lg animate-pulse bg-gray-800/10" />
+					<div className="flex flex-col items-center justify-center space-y-2 text-center">
+						<div className="w-16 h-6 rounded animate-pulse bg-gray-800/10" />
+						<div className="w-32 h-8 rounded animate-pulse bg-gray-800/10" />
+						<div className="w-24 h-12 rounded animate-pulse bg-gray-800/10" />
+					</div>
+				</div>
+			))}
+		</>
+	);
+}
+
+export const meta: MetaFunction = () => {
+	return [{ title: "Roundest (Remix + Drizzle + Bun Stack Version)" }];
+};
