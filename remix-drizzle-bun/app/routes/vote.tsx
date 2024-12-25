@@ -4,9 +4,10 @@ import type {
 	MetaFunction,
 } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Form, useLoaderData, useNavigation } from "@remix-run/react";
+import { useFetcher, useLoaderData, useNavigation } from "@remix-run/react";
 import { PokemonSprite } from "~/components/features/pokemon/sprite";
 import { getRandomPokemonPair, voteForPokemon } from "~/models/pokemon.server";
+import { cn } from "~/utils/misc";
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const pokemonPair = await getRandomPokemonPair();
@@ -33,10 +34,12 @@ export default function VotePage() {
 }
 
 function Content() {
+	const fetcher = useFetcher();
 	const { pokemonPair } = useLoaderData<typeof loader>();
 	const navigation = useNavigation();
 	const [pokemonOne, pokemonTwo] = pokemonPair;
-	const isVoting = navigation.state === "submitting";
+	const isVoting =
+		fetcher.state === "submitting" || navigation.state === "loading";
 
 	return (
 		<>
@@ -46,16 +49,19 @@ function Content() {
 				<div className="text-center">
 					<span className="text-lg text-gray-500">#{pokemonOne.id}</span>
 					<h2 className="text-2xl font-bold capitalize">{pokemonOne.name}</h2>
-					<Form method="post">
+					<fetcher.Form method="post">
 						<input type="hidden" name="votedForId" value={pokemonOne.id} />
 						<input type="hidden" name="votedAgainstId" value={pokemonTwo.id} />
 						<button
 							disabled={isVoting}
-							className="px-8 py-3 text-lg font-semibold text-white transition-colors bg-blue-500 rounded-lg hover:bg-blue-600 disabled:bg-blue-300"
+							className={cn(
+								"px-8 py-3 text-lg font-semibold text-white transition-colors bg-blue-500 rounded-lg hover:bg-blue-600 disabled:bg-blue-300",
+								isVoting && "opacity-50 cursor-not-allowed",
+							)}
 						>
 							Vote
 						</button>
-					</Form>
+					</fetcher.Form>
 				</div>
 			</div>
 
@@ -65,7 +71,7 @@ function Content() {
 				<div className="text-center">
 					<span className="text-lg text-gray-500">#{pokemonTwo.id}</span>
 					<h2 className="text-2xl font-bold capitalize">{pokemonTwo.name}</h2>
-					<Form method="post">
+					<fetcher.Form method="post">
 						<input type="hidden" name="votedForId" value={pokemonTwo.id} />
 						<input type="hidden" name="votedAgainstId" value={pokemonOne.id} />
 						<button
@@ -74,7 +80,7 @@ function Content() {
 						>
 							Vote
 						</button>
-					</Form>
+					</fetcher.Form>
 				</div>
 			</div>
 		</>
