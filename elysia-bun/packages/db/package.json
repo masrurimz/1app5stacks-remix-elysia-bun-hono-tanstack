@@ -19,7 +19,7 @@
 	"scripts": {
 		"generate": "bun with-env drizzle-kit generate",
 		"push": "bun with-env drizzle-kit push",
-		"seed": "bun with-env bunx tsx ./app/db/seed.ts",
+		"seed": "bun with-env bun ./src/db-seed.ts",
 		"studio": "bun with-env  drizzle-kit studio",
 		"with-env": "dotenv -e ../../.env --"
 	},
