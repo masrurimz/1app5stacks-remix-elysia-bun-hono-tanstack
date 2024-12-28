@@ -1,10 +1,12 @@
+import cors from "@elysiajs/cors";
+import { opentelemetry } from "@elysiajs/opentelemetry";
 import swagger from "@elysiajs/swagger";
-import { Elysia, error, t } from "elysia";
+import { Elysia } from "elysia";
 import { note } from "./note";
 import { user } from "./user";
-import { opentelemetry } from "@elysiajs/opentelemetry";
 
 const app = new Elysia()
+	.use(cors())
 	.use(opentelemetry())
 	.use(swagger())
 	.onError(({ error, code }) => {
@@ -13,11 +15,13 @@ const app = new Elysia()
 		console.error(error);
 	})
 	.get("/", ({ path }) => "Hello Elysia from " + path)
-	.get("/hello", "Do you miss me?")
+	.get("health", () => "OK")
 	.use(note)
 	.use(user)
-	.listen(3000);
+	.listen(3001);
+
+export type App = typeof app;
 
 console.log(
-	`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`,
+	`🦊 Elysia is running at http://${app.server?.hostname}:${app.server?.port}`,
 );

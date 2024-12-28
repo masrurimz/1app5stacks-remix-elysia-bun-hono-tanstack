@@ -2,6 +2,8 @@
 import * as fs from "node:fs";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/start";
+import { api } from "backend-client";
+import { useEffect } from "react";
 
 const filePath = "count.txt";
 
@@ -32,6 +34,12 @@ export const Route = createFileRoute("/")({
 function Home() {
 	const router = useRouter();
 	const state = Route.useLoaderData();
+
+	useEffect(() => {
+		api.health.get().then((res) => {
+			console.log("hello from eden: " + res.data);
+		});
+	}, []);
 
 	return (
 		<button
