@@ -11,9 +11,16 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as CountElysiaImport } from './routes/count-elysia'
 import { Route as IndexImport } from './routes/index'
 
 // Create/Update Routes
+
+const CountElysiaRoute = CountElysiaImport.update({
+  id: '/count-elysia',
+  path: '/count-elysia',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const IndexRoute = IndexImport.update({
   id: '/',
@@ -32,6 +39,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/count-elysia': {
+      id: '/count-elysia'
+      path: '/count-elysia'
+      fullPath: '/count-elysia'
+      preLoaderRoute: typeof CountElysiaImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -39,32 +53,37 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/count-elysia': typeof CountElysiaRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/count-elysia': typeof CountElysiaRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/count-elysia': typeof CountElysiaRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/count-elysia'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/count-elysia'
+  id: '__root__' | '/' | '/count-elysia'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CountElysiaRoute: typeof CountElysiaRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CountElysiaRoute: CountElysiaRoute,
 }
 
 export const routeTree = rootRoute
@@ -77,11 +96,15 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/"
+        "/",
+        "/count-elysia"
       ]
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/count-elysia": {
+      "filePath": "count-elysia.tsx"
     }
   }
 }

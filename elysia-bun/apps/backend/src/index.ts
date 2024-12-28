@@ -4,6 +4,7 @@ import swagger from "@elysiajs/swagger";
 import { Elysia } from "elysia";
 import { note } from "./note";
 import { user } from "./user";
+import { countRoutes } from "./count";
 
 const app = new Elysia()
 	.use(cors())
@@ -18,6 +19,7 @@ const app = new Elysia()
 	.get("health", () => "OK")
 	.use(note)
 	.use(user)
+	.use(countRoutes)
 	.listen(3001);
 
 export type App = typeof app;
