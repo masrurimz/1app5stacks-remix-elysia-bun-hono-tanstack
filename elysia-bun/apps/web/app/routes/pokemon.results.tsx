@@ -1,14 +1,20 @@
 import { createFileRoute, useLoaderData } from "@tanstack/react-router";
-import { edenTreaty } from "@elysiajs/eden";
 import { api } from "backend-client";
-import { PokemonSprite } from "../components/pokemon/pokemon-sprite";
+import { PokemonSprite } from "~/app/components/pokemon/pokemon-sprite";
 
-export const Route = createFileRoute("/pokemon/result")({
+export const Route = createFileRoute("/pokemon/results")({
 	loader: async () => {
 		const { data: results } = await api.pokemon.results.get();
 		return results;
 	},
 	component: ResultsPage,
+	head: () => ({
+		meta: [
+			{
+				title: "Results (Tanstack Start + Drizzle + Bun Stack Version)",
+			},
+		],
+	}),
 });
 
 function ResultsPage() {
@@ -17,7 +23,8 @@ function ResultsPage() {
 	return (
 		<div className="container px-4 py-8 mx-auto text-white">
 			<div className="grid gap-4">
-				{results ? <ResultsFallback /> : <Content />}
+				{/* {results?.length ? <ResultsFallback /> : <Content />} */}
+				<Content />
 			</div>
 		</div>
 	);
@@ -78,7 +85,3 @@ function ResultsFallback() {
 		</>
 	);
 }
-
-// export const meta: MetaFunction = () => {
-// 	return [{ title: "Results (Remix + Drizzle + Bun Stack Version)" }];
-// };

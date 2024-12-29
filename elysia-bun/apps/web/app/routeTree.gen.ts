@@ -10,161 +10,161 @@
 
 // Import Routes
 
-import { Route as rootRoute } from './routes/__root'
-import { Route as PokemonImport } from './routes/pokemon'
-import { Route as CountElysiaImport } from './routes/count-elysia'
-import { Route as IndexImport } from './routes/index'
-import { Route as PokemonIndexImport } from './routes/pokemon.index'
-import { Route as PokemonResultImport } from './routes/pokemon.result'
+import { Route as rootRoute } from "./routes/__root";
+import { Route as PokemonImport } from "./routes/pokemon";
+import { Route as CountElysiaImport } from "./routes/count-elysia";
+import { Route as IndexImport } from "./routes/index";
+import { Route as PokemonIndexImport } from "./routes/pokemon.index";
+import { Route as PokemonResultsImport } from "./routes/pokemon.results";
 
 // Create/Update Routes
 
 const PokemonRoute = PokemonImport.update({
-  id: '/pokemon',
-  path: '/pokemon',
-  getParentRoute: () => rootRoute,
-} as any)
+	id: "/pokemon",
+	path: "/pokemon",
+	getParentRoute: () => rootRoute,
+} as any);
 
 const CountElysiaRoute = CountElysiaImport.update({
-  id: '/count-elysia',
-  path: '/count-elysia',
-  getParentRoute: () => rootRoute,
-} as any)
+	id: "/count-elysia",
+	path: "/count-elysia",
+	getParentRoute: () => rootRoute,
+} as any);
 
 const IndexRoute = IndexImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRoute,
-} as any)
+	id: "/",
+	path: "/",
+	getParentRoute: () => rootRoute,
+} as any);
 
 const PokemonIndexRoute = PokemonIndexImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => PokemonRoute,
-} as any)
+	id: "/",
+	path: "/",
+	getParentRoute: () => PokemonRoute,
+} as any);
 
-const PokemonResultRoute = PokemonResultImport.update({
-  id: '/result',
-  path: '/result',
-  getParentRoute: () => PokemonRoute,
-} as any)
+const PokemonResultsRoute = PokemonResultsImport.update({
+	id: "/results",
+	path: "/results",
+	getParentRoute: () => PokemonRoute,
+} as any);
 
 // Populate the FileRoutesByPath interface
 
-declare module '@tanstack/react-router' {
-  interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/count-elysia': {
-      id: '/count-elysia'
-      path: '/count-elysia'
-      fullPath: '/count-elysia'
-      preLoaderRoute: typeof CountElysiaImport
-      parentRoute: typeof rootRoute
-    }
-    '/pokemon': {
-      id: '/pokemon'
-      path: '/pokemon'
-      fullPath: '/pokemon'
-      preLoaderRoute: typeof PokemonImport
-      parentRoute: typeof rootRoute
-    }
-    '/pokemon/result': {
-      id: '/pokemon/result'
-      path: '/result'
-      fullPath: '/pokemon/result'
-      preLoaderRoute: typeof PokemonResultImport
-      parentRoute: typeof PokemonImport
-    }
-    '/pokemon/': {
-      id: '/pokemon/'
-      path: '/'
-      fullPath: '/pokemon/'
-      preLoaderRoute: typeof PokemonIndexImport
-      parentRoute: typeof PokemonImport
-    }
-  }
+declare module "@tanstack/react-router" {
+	interface FileRoutesByPath {
+		"/": {
+			id: "/";
+			path: "/";
+			fullPath: "/";
+			preLoaderRoute: typeof IndexImport;
+			parentRoute: typeof rootRoute;
+		};
+		"/count-elysia": {
+			id: "/count-elysia";
+			path: "/count-elysia";
+			fullPath: "/count-elysia";
+			preLoaderRoute: typeof CountElysiaImport;
+			parentRoute: typeof rootRoute;
+		};
+		"/pokemon": {
+			id: "/pokemon";
+			path: "/pokemon";
+			fullPath: "/pokemon";
+			preLoaderRoute: typeof PokemonImport;
+			parentRoute: typeof rootRoute;
+		};
+		"/pokemon/results": {
+			id: "/pokemon/results";
+			path: "/results";
+			fullPath: "/pokemon/results";
+			preLoaderRoute: typeof PokemonResultsImport;
+			parentRoute: typeof PokemonImport;
+		};
+		"/pokemon/": {
+			id: "/pokemon/";
+			path: "/";
+			fullPath: "/pokemon/";
+			preLoaderRoute: typeof PokemonIndexImport;
+			parentRoute: typeof PokemonImport;
+		};
+	}
 }
 
 // Create and export the route tree
 
 interface PokemonRouteChildren {
-  PokemonResultRoute: typeof PokemonResultRoute
-  PokemonIndexRoute: typeof PokemonIndexRoute
+	PokemonResultsRoute: typeof PokemonResultsRoute;
+	PokemonIndexRoute: typeof PokemonIndexRoute;
 }
 
 const PokemonRouteChildren: PokemonRouteChildren = {
-  PokemonResultRoute: PokemonResultRoute,
-  PokemonIndexRoute: PokemonIndexRoute,
-}
+	PokemonResultsRoute: PokemonResultsRoute,
+	PokemonIndexRoute: PokemonIndexRoute,
+};
 
 const PokemonRouteWithChildren =
-  PokemonRoute._addFileChildren(PokemonRouteChildren)
+	PokemonRoute._addFileChildren(PokemonRouteChildren);
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/count-elysia': typeof CountElysiaRoute
-  '/pokemon': typeof PokemonRouteWithChildren
-  '/pokemon/result': typeof PokemonResultRoute
-  '/pokemon/': typeof PokemonIndexRoute
+	"/": typeof IndexRoute;
+	"/count-elysia": typeof CountElysiaRoute;
+	"/pokemon": typeof PokemonRouteWithChildren;
+	"/pokemon/results": typeof PokemonResultsRoute;
+	"/pokemon/": typeof PokemonIndexRoute;
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/count-elysia': typeof CountElysiaRoute
-  '/pokemon/result': typeof PokemonResultRoute
-  '/pokemon': typeof PokemonIndexRoute
+	"/": typeof IndexRoute;
+	"/count-elysia": typeof CountElysiaRoute;
+	"/pokemon/results": typeof PokemonResultsRoute;
+	"/pokemon": typeof PokemonIndexRoute;
 }
 
 export interface FileRoutesById {
-  __root__: typeof rootRoute
-  '/': typeof IndexRoute
-  '/count-elysia': typeof CountElysiaRoute
-  '/pokemon': typeof PokemonRouteWithChildren
-  '/pokemon/result': typeof PokemonResultRoute
-  '/pokemon/': typeof PokemonIndexRoute
+	__root__: typeof rootRoute;
+	"/": typeof IndexRoute;
+	"/count-elysia": typeof CountElysiaRoute;
+	"/pokemon": typeof PokemonRouteWithChildren;
+	"/pokemon/results": typeof PokemonResultsRoute;
+	"/pokemon/": typeof PokemonIndexRoute;
 }
 
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/count-elysia'
-    | '/pokemon'
-    | '/pokemon/result'
-    | '/pokemon/'
-  fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/count-elysia' | '/pokemon/result' | '/pokemon'
-  id:
-    | '__root__'
-    | '/'
-    | '/count-elysia'
-    | '/pokemon'
-    | '/pokemon/result'
-    | '/pokemon/'
-  fileRoutesById: FileRoutesById
+	fileRoutesByFullPath: FileRoutesByFullPath;
+	fullPaths:
+		| "/"
+		| "/count-elysia"
+		| "/pokemon"
+		| "/pokemon/results"
+		| "/pokemon/";
+	fileRoutesByTo: FileRoutesByTo;
+	to: "/" | "/count-elysia" | "/pokemon/results" | "/pokemon";
+	id:
+		| "__root__"
+		| "/"
+		| "/count-elysia"
+		| "/pokemon"
+		| "/pokemon/results"
+		| "/pokemon/";
+	fileRoutesById: FileRoutesById;
 }
 
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  CountElysiaRoute: typeof CountElysiaRoute
-  PokemonRoute: typeof PokemonRouteWithChildren
+	IndexRoute: typeof IndexRoute;
+	CountElysiaRoute: typeof CountElysiaRoute;
+	PokemonRoute: typeof PokemonRouteWithChildren;
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  CountElysiaRoute: CountElysiaRoute,
-  PokemonRoute: PokemonRouteWithChildren,
-}
+	IndexRoute: IndexRoute,
+	CountElysiaRoute: CountElysiaRoute,
+	PokemonRoute: PokemonRouteWithChildren,
+};
 
 export const routeTree = rootRoute
-  ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+	._addFileChildren(rootRouteChildren)
+	._addFileTypes<FileRouteTypes>();
 
 /* ROUTE_MANIFEST_START
 {
@@ -186,12 +186,12 @@ export const routeTree = rootRoute
     "/pokemon": {
       "filePath": "pokemon.tsx",
       "children": [
-        "/pokemon/result",
+        "/pokemon/results",
         "/pokemon/"
       ]
     },
-    "/pokemon/result": {
-      "filePath": "pokemon.result.tsx",
+    "/pokemon/results": {
+      "filePath": "pokemon.results.tsx",
       "parent": "/pokemon"
     },
     "/pokemon/": {

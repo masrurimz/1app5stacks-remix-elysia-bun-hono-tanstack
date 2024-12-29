@@ -1,3 +1,8 @@
 {
-	"conventionalCommits.scopes": ["pokemon-vote-ui", "elysia-bun", "db"]
+	"conventionalCommits.scopes": [
+		"pokemon-vote-ui",
+		"elysia-bun",
+		"db",
+		"tailwind"
+	]
 }

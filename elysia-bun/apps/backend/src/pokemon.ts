@@ -46,19 +46,19 @@ export const pokemonRoutes = new Elysia({ prefix: "/pokemon" })
 		},
 	)
 	.get("/results", async () => {
-		return db
+		const results = await db
 			.select({
 				dexId: pokemon.id,
 				name: pokemon.name,
 				upVotes: sql<number>`count(distinct ${votes.id}) filter (where ${votes.votedForId} = ${pokemon.id})`,
 				downVotes: sql<number>`count(distinct ${votes.id}) filter (where ${votes.votedAgainstId} = ${pokemon.id})`,
 				winPercentage: sql<number>`
-          case 
-            when (count(${votes.id}) filter (where ${votes.votedForId} = ${pokemon.id} or ${votes.votedAgainstId} = ${pokemon.id})) = 0 then 0
-            else CAST(count(${votes.id}) filter (where ${votes.votedForId} = ${pokemon.id}) AS FLOAT) * 100.0 / 
-                 count(${votes.id}) filter (where ${votes.votedForId} = ${pokemon.id} or ${votes.votedAgainstId} = ${pokemon.id})
-          end
-        `,
+        case 
+          when (count(${votes.id}) filter (where ${votes.votedForId} = ${pokemon.id} or ${votes.votedAgainstId} = ${pokemon.id})) = 0 then 0
+          else CAST(count(${votes.id}) filter (where ${votes.votedForId} = ${pokemon.id}) AS FLOAT) * 100.0 / 
+               count(${votes.id}) filter (where ${votes.votedForId} = ${pokemon.id} or ${votes.votedAgainstId} = ${pokemon.id})
+        end
+      `,
 			})
 			.from(pokemon)
 			.leftJoin(
@@ -69,5 +69,16 @@ export const pokemonRoutes = new Elysia({ prefix: "/pokemon" })
 				),
 			)
 			.groupBy(pokemon.id, pokemon.name)
-			.orderBy(desc(sql`winPercentage`), desc(sql`upVotes`));
+			.orderBy(
+				desc(sql`case 
+        when (count(${votes.id}) filter (where ${votes.votedForId} = ${pokemon.id} or ${votes.votedAgainstId} = ${pokemon.id})) = 0 then 0
+        else CAST(count(${votes.id}) filter (where ${votes.votedForId} = ${pokemon.id}) AS FLOAT) * 100.0 / 
+             count(${votes.id}) filter (where ${votes.votedForId} = ${pokemon.id} or ${votes.votedAgainstId} = ${pokemon.id})
+      end`),
+				desc(
+					sql`count(distinct ${votes.id}) filter (where ${votes.votedForId} = ${pokemon.id})`,
+				),
+			);
+
+		return results;
 	});
