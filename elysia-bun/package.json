@@ -4,7 +4,8 @@
 	"description": "Elysia Backend + React Native + Next.js",
 	"workspaces": [
 		"apps/*",
-		"packages/*"
+		"packages/*",
+		"tooling/*"
 	],
 	"scripts": {
 		"dev": "concurrently -n 'backend,web' -c '#007755,#2f6da3,#550077' 'cd apps/backend && bun dev' 'cd apps/web && bun --bun run dev'",
