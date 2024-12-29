@@ -8,7 +8,7 @@ if (!process.env.DATABASE_URL) {
 
 export default {
 	out: "./migrations",
-	schema: "./src/db-schema.ts",
+	schema: "./src/schema.ts",
 	breakpoints: true,
 	dialect: "sqlite",
 	// Set driver only if you are using aws-data-api, turso, d1-http, or expo

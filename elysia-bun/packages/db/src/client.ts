@@ -2,7 +2,7 @@ import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 import { migrate } from "drizzle-orm/libsql/migrator";
 
-import * as schema from "./db-schema";
+import * as schema from "./schema";
 
 if (!process.env.DATABASE_URL) {
 	throw new Error("DATABASE_URL is required");
@@ -15,4 +15,6 @@ export const client = createClient({
 
 export const db = drizzle(client, { schema });
 
-await migrate(db, { migrationsFolder: "migrations" });
+await migrate(db, {
+	migrationsFolder: `${process.env.ROOT_DIR}/packages/db/migrations`,
+});

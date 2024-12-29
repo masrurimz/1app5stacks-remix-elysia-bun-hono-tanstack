@@ -1,10 +1,8 @@
-import "dotenv/config";
-
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 import { migrate } from "drizzle-orm/libsql/migrator";
 
-import { notes, passwords, pokemon, users } from "./db-schema";
+import { notes, passwords, pokemon, users } from "./schema";
 
 async function getAllPokemon() {
 	const query = `
@@ -26,16 +24,18 @@ async function getAllPokemon() {
 		body: JSON.stringify({ query }),
 	});
 
-	const data = (await response.json()).data as {
-		pokemon_v2_pokemon: {
-			id: number;
-			pokemon_v2_pokemonspecy: {
-				name: string;
-			};
-		}[];
+	const responseData = (await response.json()) as {
+		data: {
+			pokemon_v2_pokemon: {
+				id: number;
+				pokemon_v2_pokemonspecy: {
+					name: string;
+				};
+			}[];
+		};
 	};
 
-	return data.pokemon_v2_pokemon.map((pokemon) => ({
+	return responseData.data.pokemon_v2_pokemon.map((pokemon) => ({
 		id: pokemon.id,
 		name: pokemon.pokemon_v2_pokemonspecy.name,
 	}));
@@ -53,7 +53,9 @@ const client = createClient({
 const db = drizzle(client);
 
 async function seed() {
-	await migrate(db, { migrationsFolder: "migrations" });
+	await migrate(db, {
+		migrationsFolder: `${process.env.ROOT_DIR}/packages/db/migrations`,
+	});
 
 	let user = await db
 		.insert(users)

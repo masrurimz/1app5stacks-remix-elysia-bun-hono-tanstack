@@ -5,6 +5,7 @@ import { Elysia } from "elysia";
 import { note } from "./note";
 import { user } from "./user";
 import { countRoutes } from "./count";
+import { pokemonRoutes } from "./pokemon";
 
 const app = new Elysia()
 	.use(cors())
@@ -20,6 +21,7 @@ const app = new Elysia()
 	.use(note)
 	.use(user)
 	.use(countRoutes)
+	.use(pokemonRoutes)
 	.listen(3001);
 
 export type App = typeof app;

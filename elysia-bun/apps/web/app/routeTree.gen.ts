@@ -11,10 +11,19 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as PokemonImport } from './routes/pokemon'
 import { Route as CountElysiaImport } from './routes/count-elysia'
 import { Route as IndexImport } from './routes/index'
+import { Route as PokemonIndexImport } from './routes/pokemon.index'
+import { Route as PokemonResultImport } from './routes/pokemon.result'
 
 // Create/Update Routes
+
+const PokemonRoute = PokemonImport.update({
+  id: '/pokemon',
+  path: '/pokemon',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const CountElysiaRoute = CountElysiaImport.update({
   id: '/count-elysia',
@@ -26,6 +35,18 @@ const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
+} as any)
+
+const PokemonIndexRoute = PokemonIndexImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PokemonRoute,
+} as any)
+
+const PokemonResultRoute = PokemonResultImport.update({
+  id: '/result',
+  path: '/result',
+  getParentRoute: () => PokemonRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -46,44 +67,99 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CountElysiaImport
       parentRoute: typeof rootRoute
     }
+    '/pokemon': {
+      id: '/pokemon'
+      path: '/pokemon'
+      fullPath: '/pokemon'
+      preLoaderRoute: typeof PokemonImport
+      parentRoute: typeof rootRoute
+    }
+    '/pokemon/result': {
+      id: '/pokemon/result'
+      path: '/result'
+      fullPath: '/pokemon/result'
+      preLoaderRoute: typeof PokemonResultImport
+      parentRoute: typeof PokemonImport
+    }
+    '/pokemon/': {
+      id: '/pokemon/'
+      path: '/'
+      fullPath: '/pokemon/'
+      preLoaderRoute: typeof PokemonIndexImport
+      parentRoute: typeof PokemonImport
+    }
   }
 }
 
 // Create and export the route tree
 
+interface PokemonRouteChildren {
+  PokemonResultRoute: typeof PokemonResultRoute
+  PokemonIndexRoute: typeof PokemonIndexRoute
+}
+
+const PokemonRouteChildren: PokemonRouteChildren = {
+  PokemonResultRoute: PokemonResultRoute,
+  PokemonIndexRoute: PokemonIndexRoute,
+}
+
+const PokemonRouteWithChildren =
+  PokemonRoute._addFileChildren(PokemonRouteChildren)
+
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/count-elysia': typeof CountElysiaRoute
+  '/pokemon': typeof PokemonRouteWithChildren
+  '/pokemon/result': typeof PokemonResultRoute
+  '/pokemon/': typeof PokemonIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/count-elysia': typeof CountElysiaRoute
+  '/pokemon/result': typeof PokemonResultRoute
+  '/pokemon': typeof PokemonIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/count-elysia': typeof CountElysiaRoute
+  '/pokemon': typeof PokemonRouteWithChildren
+  '/pokemon/result': typeof PokemonResultRoute
+  '/pokemon/': typeof PokemonIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/count-elysia'
+  fullPaths:
+    | '/'
+    | '/count-elysia'
+    | '/pokemon'
+    | '/pokemon/result'
+    | '/pokemon/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/count-elysia'
-  id: '__root__' | '/' | '/count-elysia'
+  to: '/' | '/count-elysia' | '/pokemon/result' | '/pokemon'
+  id:
+    | '__root__'
+    | '/'
+    | '/count-elysia'
+    | '/pokemon'
+    | '/pokemon/result'
+    | '/pokemon/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CountElysiaRoute: typeof CountElysiaRoute
+  PokemonRoute: typeof PokemonRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CountElysiaRoute: CountElysiaRoute,
+  PokemonRoute: PokemonRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -97,7 +173,8 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/count-elysia"
+        "/count-elysia",
+        "/pokemon"
       ]
     },
     "/": {
@@ -105,6 +182,21 @@ export const routeTree = rootRoute
     },
     "/count-elysia": {
       "filePath": "count-elysia.tsx"
+    },
+    "/pokemon": {
+      "filePath": "pokemon.tsx",
+      "children": [
+        "/pokemon/result",
+        "/pokemon/"
+      ]
+    },
+    "/pokemon/result": {
+      "filePath": "pokemon.result.tsx",
+      "parent": "/pokemon"
+    },
+    "/pokemon/": {
+      "filePath": "pokemon.index.tsx",
+      "parent": "/pokemon"
     }
   }
 }
